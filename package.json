@@ -1,6 +1,6 @@
 {
   "name": "pify-proto",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Promisify methods on the prototype of an object",
   "license": "MIT",
   "repository": {
@@ -42,6 +42,7 @@
   "devDependencies": {
     "ava": "*",
     "pinkie-promise": "^2.0.0",
+    "util": "^0.10.3",
     "v8-natives": "0.0.2"
   }
 }

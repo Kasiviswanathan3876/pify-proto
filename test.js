@@ -1,18 +1,23 @@
 import test from 'ava';
 import pinkiePromise from 'pinkie-promise';
+import util from 'util';
 import pify from './';
 
 global.Promise = pinkiePromise;
 
-function Fixture() {}
+function FixtureParent () {}
+Fixture.prototype.parentMethod = function (cb) { setImmediate(() => cb(null, this.spongebob)) }
 
+function Fixture () {}
 Fixture.prototype.spongebob = 'squarepants'
 Fixture.prototype.methodSync = () => 'unicorn'
 Fixture.prototype.method1 = cb => setImmediate(() => cb(null, 'unicorn'));
 Fixture.prototype.method2 = (x, cb) => setImmediate(() => cb(null, x));
 Fixture.prototype.method3 = cb => setImmediate(() => cb(null));
 Fixture.prototype.method4 = function (cb) { setImmediate(() => this.method1(cb)) }
-Fixture.prototype.method5 = function (cb) { cb(null, this.spongebob) }
+Fixture.prototype.method5 = function (cb) { setImmediate(() => cb(null, this.spongebob)) }
+
+util.inherits(Fixture, FixtureParent)
 
 const pifyd = pify(new Fixture());
 
@@ -28,6 +33,10 @@ test('main', async t => {
 test('pass argument', async t => {
 	t.is(await pifyd.method2('rainbow'), 'rainbow');
 });
+
+test('includes parent prototype', async t => {
+	t.is(await pifyd.parentMethod(), 'squarepants')
+})
 
 test('custom Promise module', async t => {
 	t.is(await pify(new Fixture(), pinkiePromise).method1(), 'unicorn');
